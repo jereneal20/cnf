@@ -11,8 +11,7 @@ class Formula:
 
     def __init__(self, tokens):
         token = tokens.popleft()
-        if token == "&" or token == "|" or \
-           token == ">" or token == "<" or token == "=":
+        if Formula.isBinaryToken(token):
             self.operator = token
             self.left = Formula(tokens)
             self.right = Formula(tokens)
@@ -24,11 +23,32 @@ class Formula:
             # print("Invalid operator or syntax.\n")
             # exit(1)
 
+    def isBinaryToken(token):
+        if token == "&" or token == "|" or \
+           token == ">" or token == "<" or token == "=":
+            return True
+        else:
+            return False
+
+    def formulaAsString(self):
+        # Make formula string as polish notation
+        string = ""
+        if Formula.isBinaryToken(self.operator):
+            return string+self.operator+" "+self.left.formulaAsString()+" "+self.right.formulaAsString()
+        elif self.operator == "-":
+            return string + self.operator + " " + self.left.formulaAsString()
+            pass
+        else:
+            return string + self.left
+            pass
+
 
 def main(argv):
     print(sampleInput)
 
     originalFormula = Formula(deque(sampleInput.split()))
+
+    print(originalFormula.formulaAsString())
 
 
 if __name__ == "__main__":
