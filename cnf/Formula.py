@@ -36,3 +36,16 @@ class Formula:
 			return string + self.operator + " " + self.left.formulaAsString()
 		else:
 			return string + self.left
+
+	def formulaAsInfixString(self):
+		# Make formula string as infix
+		string = ""
+		if Formula.isBinaryToken(self.operator):
+			if self.operator == "&":
+				return string +" ( "+ self.left.formulaAsInfixString() + " ) " + self.operator + " ( " + self.right.formulaAsInfixString() +" )"
+			else:
+				return string + self.left.formulaAsInfixString() + " " + self.operator + " "  + self.right.formulaAsInfixString()
+		elif self.operator == "-":
+			return string + self.operator + " " + self.left.formulaAsInfixString()
+		else:
+			return string + self.left
