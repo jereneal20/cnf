@@ -42,7 +42,7 @@ class Formula:
 		string = ""
 		if Formula.isBinaryToken(self.operator):
 			if self.operator == "&":
-				return string +" ( "+ self.left.formulaAsInfixString() + " ) " + self.operator + " ( " + self.right.formulaAsInfixString() +" )"
+				return string +"( "+ self.left.formulaAsInfixString() + " ) " + self.operator + " ( " + self.right.formulaAsInfixString() +" )"
 			else:
 				return string + self.left.formulaAsInfixString() + " " + self.operator + " "  + self.right.formulaAsInfixString()
 		elif self.operator == "-":

@@ -1,19 +1,31 @@
 #!/usr/bin/python
-import os, sys
+import os, sys, subprocess
 from collections import deque
 
 from Formula import Formula
 import ConvertToCNF as CNF
 
-varDictionary = {}
 sampleInput = "> & - p q & p > r q"
 sampleInput2 = "- = - a1 b2"
+sampleInput3 = "= - a1 a1"
 
+def createVarDictionary(cnfForm):
+    varDictionary = {}
+    iterNum = 1
+    for token in cnfForm.formulaAsString().split():
+        if token == "&" or token == "|" or token == "-":
+            continue
+        elif token not in varDictionary:
+            varDictionary[token] = iterNum
+            iterNum += 1
+        else:
+            pass
+    return varDictionary
 
-def getMiniSATString(infixForm):
+def getMiniSATString(infixForm, varDictionary):
     minisatStr = "c convert to CNF\np cnf " + str(len(varDictionary))
     minisatContent = ""
-    iterNum = 0
+    iterNum = 1
     for token in infixForm.split():
         if token in varDictionary:
             minisatContent += str(varDictionary[token]) + " "
@@ -26,34 +38,52 @@ def getMiniSATString(infixForm):
     minisatStr += " " + str(iterNum) + "\n" + minisatContent
     return minisatStr
 
-def main(argv):
-    print(sampleInput)
+def getMiniSATResult(miniSATStr):
+    f = open("miniSAT.in", 'w')
+    f.write(miniSATStr)
+    f.close()
 
-    originalFormula = Formula(deque(sampleInput.split()))
-    print(originalFormula.formulaAsString())
+    miniSATLog = open("err.log", "w")
+    subprocess.call(['minisat', 'miniSAT.in', 'miniSAT.out'], stdout=miniSATLog, stderr=miniSATLog)
+    miniSATLog.close()
+
+    f = open("miniSAT.out", 'r')
+    result = f.readline()
+    f.close()
+
+    if result == "SAT\n":
+        return "Not Valid"
+    elif result == "UNSAT\n":
+        return "Valid"
+    else:
+        return "Neither SAT nor UNSAT"
+
+
+
+def main(argv):
+    if len(argv) >= 2:
+        print ("Use \" \" to the propositional formula: Syntax Example: cnf \"> & - p q & p > r q\"")
+        exit(0)
+    elif len(argv) == 0:
+        print ("Input format error: Syntax Example: cnf \"> & - p q & p > r q\"")
+        exit(0)
+
+    print("Input: "+ argv[1])
+    originalFormula = Formula(deque(argv[1].split()))
 
     conjNormForm = CNF.convertToCNF(originalFormula)
-    print("ConjNorm: " + conjNormForm.formulaAsString())
+    print("CNF Form  : " + conjNormForm.formulaAsString())
 
     infix = conjNormForm.formulaAsInfixString()
-    print ("Infix "+infix)
+    print ("Infix Form: "+infix)
+
+    varDictionary = createVarDictionary(conjNormForm)
+    miniSATStr = getMiniSATString(infix, varDictionary)
+    print(getMiniSATResult(miniSATStr))
 
 
-    iterNum = 1
-    for token in conjNormForm.formulaAsString().split():
-        if token == "&" or token == "|" or token == "-":
-            continue
-        elif token not in varDictionary:
-            varDictionary[token] = iterNum
-            iterNum += 1
-        else:
-            pass
-
-    print(getMiniSATString(infix))
-
-
-    for a in varDictionary:
-        print(a)
+    # for a in varDictionary:
+    #     print(a)
 
     # implFreeFormula = CNF.implicationFree(CNF.equivalanceFree(originalFormula))
     # print("ImplFree: "+ implFreeFormula.formulaAsString())
@@ -63,6 +93,7 @@ def main(argv):
 	#
     # conjNorm = CNF.conjunctiveNormalForm(negFreeForm)
     # print("ConjNorm: " + conjNorm.formulaAsString())
+
 
 
 if __name__ == "__main__":
