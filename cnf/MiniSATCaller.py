@@ -1,5 +1,6 @@
 from Formula import Formula
 import subprocess
+import time
 
 def createVarDictionary(cnfForm):
 	varDictionary = {}
@@ -32,11 +33,17 @@ def getMiniSATString(infixForm, varDictionary):
 
 def getMiniSATResult(miniSATStr):
 	f = open("miniSAT.in", 'w')
+
 	f.write(miniSATStr)
 	f.close()
 
 	miniSATLog = open("log", "w")
-	subprocess.call(['minisat', 'miniSAT.in', 'miniSAT.out'], stdout=miniSATLog, stderr=miniSATLog)
+	p = subprocess.Popen(['minisat', 'miniSAT.in', 'miniSAT.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+	p.communicate()
+	p.wait()
+
+
 	miniSATLog.close()
 
 	f = open("miniSAT.out", 'r')
