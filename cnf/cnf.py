@@ -11,45 +11,36 @@ sampleInput2 = "- = - a1 b2"
 sampleInput3 = "= - a1 a1"
 
 
-
 def main(argv):
-	# if len(argv) >= 2:
-	#     print ("Use \" \" to the propositional formula: Syntax Example: cnf \"> & - p q & p > r q\"")
-	#     exit(0)
-	# elif len(argv) == 0:
-	#     print ("Input format error: Syntax Example: cnf \"> & - p q & p > r q\"")
-	#     exit(0)
+	if len(argv) >= 2:
+		print ("Use \" \" to the propositional formula: Syntax Example: cnf \"> & - p q & p > r q\"")
+		exit(0)
+	elif len(argv) == 0:
+		print ("Input format error: Syntax Example: cnf \"> & - p q & p > r q\"")
+		exit(0)
+	input = argv[0]
 
-	print("Input: "+ sampleInput)
-	originalFormula = Formula(deque(sampleInput.split()))
+	# print("Input: "+ argv[0])
+	originalFormula = Formula(deque(input.split()))
 
 	conjNormForm = CNF.convertToCNF(originalFormula)
-	print("CNF Form  : " + conjNormForm.formulaAsString())
+	print(conjNormForm.formulaAsString())
+	# print("CNF Form  : " + conjNormForm.formulaAsString())
 
 	infix = conjNormForm.formulaAsInfixString()
-	print ("Infix Form: "+infix)
+	print (infix)
+	# print ("Infix Form: "+infix)
 
 	varDictionary = minisat.createVarDictionary(conjNormForm)
 	miniSATStr = minisat.getMiniSATString(infix, varDictionary)
-	print(minisat.getMiniSATResult(miniSATStr))
-
-	f = open("miniSAT.out", 'r')
-	f.readline()
-	result = f.readline().split()
-	intResult = []
-	for iter in result:
-		intIter = int(iter)
-		if intIter != 0:
-			intResult.append(intIter)
-			pass
+	minisat.getMiniSATResult(miniSATStr)
 
 
-	dictionary2 = minisat.getResultDictionary(sampleInput,varDictionary)
-
-	print(varDictionary)
-	print(result)
-	print(dictionary2)
-
+	notForm = CNF.convertToCNF(CNF.wrapNotFormula(Formula(deque(input.split()))))
+	infix2 = notForm.formulaAsInfixString()
+	varDictionary2 = minisat.createVarDictionary(notForm)
+	miniSATStr2 = minisat.getMiniSATString(infix2, varDictionary2)
+	print(minisat.getMiniSATResult(miniSATStr2))
 
 	# for a in varDictionary:
 	#     print(a)

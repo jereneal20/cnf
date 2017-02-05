@@ -2,7 +2,9 @@
 *.swo
 *.swn
 
-
+miniSAT.in
+miniSAT.out
+log
 
 ### PyCharm ###
 .idea/
